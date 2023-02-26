@@ -1,6 +1,7 @@
 import { OptionO, OptionX } from '@/components/options';
 import Head from 'next/head'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { io } from "socket.io-client";
 
 const size = 72;
 const gap = 4;
@@ -9,11 +10,38 @@ const maxSize = size * 3 + gap * 2;
 export default function Home() {
   const [points, setPoints] = useState<number[]>(Array(9).fill(0));
 
-  const handleClick = (i: number) => {
+  const handleClick = async (i: number) => {
+    // send points
     const newPoints = [...points];
-    newPoints[i] = i % 2 ? 1 : -1;
-    setPoints(newPoints);
+    newPoints[i] = i%2 ? 1 : -1;
+    
+    const fetchPromise = await fetch('/api/xox', {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        points: newPoints
+      })
+    });
   };
+
+  useEffect((): any => {
+    const socket = io(`http://localhost:3000`, {
+      path: "/api/socket"
+    });
+
+    socket.on("connect", () => {
+      console.log("SOCKET CONNECTED!", socket.id);
+    });
+
+    socket.on("points", (points: number[]) => {
+      console.log("SOCKET POINTS!", points);
+      setPoints(points);
+    });
+
+    if (socket) return () => socket.disconnect();
+  }, []);
 
   return (
     <>
