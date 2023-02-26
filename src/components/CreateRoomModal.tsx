@@ -1,19 +1,37 @@
-import React from "react";
+import React, { useState } from "react";
 
 export type CreateRoomModalProps = {
     open?: boolean;
     onClose?: () => void;
-    onCreate?: () => void;
 };
 
 const CreateRoomModal = ({
     open,
     onClose,
-    onCreate,
 }: CreateRoomModalProps) => {
+    const [isCreating, setIsCreating] = useState(false);
+    const [form, setForm] = useState({
+        name: "",
+        password: "",
+    })
 
-    const handleCreateClick = () => {
-        onCreate && onCreate();
+    const handleCreateClick = async () => {
+        const room = {
+            ...form,
+            players: [{
+                id: "1",
+                option: "x"
+            }]
+        }
+        setIsCreating(true)
+        await fetch("/api/room", {
+            body: JSON.stringify(room),
+            headers: {
+                "Content-Type": "application/json"
+            },
+            method: "POST"
+        })
+        setIsCreating(false)
     }
 
     const handleCancelClick = () => {
@@ -39,6 +57,7 @@ const CreateRoomModal = ({
                                             className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                             placeholder="room name"
                                             required
+                                            onChange={(e) => setForm({ ...form, name: e.target.value })}
                                         />
                                     </div>
                                     <div>
@@ -46,9 +65,10 @@ const CreateRoomModal = ({
                                         <input
                                             type="password"
                                             name="password"
+                                            className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                             id="password"
                                             placeholder="••••••••"
-                                            className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                            onChange={(e) => setForm({ ...form, password: e.target.value })}
                                         />
                                     </div>
                                 </div>

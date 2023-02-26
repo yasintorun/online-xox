@@ -12,22 +12,7 @@ const maxSize = size * 3 + gap * 2;
 
 export default function Home() {
   const [points, setPoints] = useState<number[]>(Array(9).fill(0));
-  const [option, setOption] = useState<"x" | "o">("x");
-  const handleClick = async (i: number) => {
-    // send points
-    const newPoints = [...points];
-    newPoints[i] = i % 2 ? 1 : -1;
-
-    const fetchPromise = await fetch('/api/xox', {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        points: newPoints
-      })
-    });
-  };
+  const [rooms, setRooms] = useState<Room[]>([]);
 
   useEffect((): any => {
     const socket = io(`http://localhost:3000`, {
@@ -43,43 +28,10 @@ export default function Home() {
       setPoints(points);
     });
 
+    fetch("/api/room").then(res => res.json()).then(setRooms);
+
     if (socket) return () => socket.disconnect();
   }, []);
-
-  const rooms: Room[] = [
-    {
-      id: "1",
-      name: "I am a room",
-      password: "1234",
-      players: [
-        {
-          id: "1",
-          option: "x"
-        },
-        {
-          id: "2",
-          option: "o"
-        }
-      ],
-      points: Array(9).fill(0),
-    },
-    {
-      id: "12",
-      name: "Lets play :)",
-      password: "1234",
-      players: [
-        {
-          id: "1",
-          option: "x"
-        },
-        {
-          id: "2",
-          option: "o"
-        }
-      ],
-      points: Array(9).fill(0),
-    }
-  ]
 
   return (
     <>
