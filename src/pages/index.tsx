@@ -1,4 +1,7 @@
+import CreateRoomModal from '@/components/CreateRoomModal';
 import { OptionO, OptionX } from '@/components/options';
+import RoomList from '@/components/RoomList';
+import { Room } from '@/models/Room';
 import Head from 'next/head'
 import { useEffect, useState } from 'react';
 import { io } from "socket.io-client";
@@ -9,12 +12,12 @@ const maxSize = size * 3 + gap * 2;
 
 export default function Home() {
   const [points, setPoints] = useState<number[]>(Array(9).fill(0));
-
+  const [option, setOption] = useState<"x" | "o">("x");
   const handleClick = async (i: number) => {
     // send points
     const newPoints = [...points];
-    newPoints[i] = i%2 ? 1 : -1;
-    
+    newPoints[i] = i % 2 ? 1 : -1;
+
     const fetchPromise = await fetch('/api/xox', {
       method: "POST",
       headers: {
@@ -43,6 +46,41 @@ export default function Home() {
     if (socket) return () => socket.disconnect();
   }, []);
 
+  const rooms: Room[] = [
+    {
+      id: "1",
+      name: "I am a room",
+      password: "1234",
+      players: [
+        {
+          id: "1",
+          option: "x"
+        },
+        {
+          id: "2",
+          option: "o"
+        }
+      ],
+      points: Array(9).fill(0),
+    },
+    {
+      id: "12",
+      name: "Lets play :)",
+      password: "1234",
+      players: [
+        {
+          id: "1",
+          option: "x"
+        },
+        {
+          id: "2",
+          option: "o"
+        }
+      ],
+      points: Array(9).fill(0),
+    }
+  ]
+
   return (
     <>
       <Head>
@@ -51,7 +89,15 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className='h-screen w-full flex justify-center items-center bg-gray-800'>
+      <main className='h-screen w-full flex2 flex-col justify-center items-center gap-10 bg-gray-800'>
+        {/* <button
+          type="button"
+          className="inline-flex justify-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
+          onClick={() => setIsOpenCreateRoomModal(true)}
+        >
+          Oda Oluştur
+        </button>
+        <CreateRoomModal open={isOpenCreateRoomModal} onClose={() => setIsOpenCreateRoomModal(false)} />
         <div className="grid grid-cols-3 bg-teal-400" style={{ maxWidth: maxSize, gap }}>
           {points.map((point, i) => (
             <div
@@ -62,7 +108,8 @@ export default function Home() {
               {point === 1 ? <OptionX /> : point === -1 ? <OptionO /> : null}
             </div>
           ))}
-        </div>
+        </div> */}
+        <RoomList rooms={rooms} />
       </main>
     </>
   )
