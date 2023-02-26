@@ -1,6 +1,20 @@
+import { OptionO, OptionX } from '@/components/options';
 import Head from 'next/head'
+import { useState } from 'react';
+
+const size = 72;
+const gap = 4;
+const maxSize = size * 3 + gap * 2;
 
 export default function Home() {
+  const [points, setPoints] = useState<number[]>(Array(9).fill(0));
+
+  const handleClick = (i: number) => {
+    const newPoints = [...points];
+    newPoints[i] = i % 2 ? 1 : -1;
+    setPoints(newPoints);
+  };
+
   return (
     <>
       <Head>
@@ -9,10 +23,18 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main>
-        <h1 className="text-3xl font-bold underline">
-          Hello world!
-        </h1>
+      <main className='h-screen w-full flex justify-center items-center bg-gray-800'>
+        <div className="grid grid-cols-3 bg-teal-400" style={{ maxWidth: maxSize, gap }}>
+          {points.map((point, i) => (
+            <div
+              className="bg-gray-800 flex justify-center items-center"
+              style={{ width: size, height: size }}
+              onClick={() => handleClick(i)}
+            >
+              {point === 1 ? <OptionX /> : point === -1 ? <OptionO /> : null}
+            </div>
+          ))}
+        </div>
       </main>
     </>
   )
